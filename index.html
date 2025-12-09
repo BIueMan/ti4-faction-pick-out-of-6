@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI4 Faction Picker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .faction {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .faction:hover {
+            border-color: rgba(255, 215, 0, 0.6);
+            transform: scale(1.05);
+        }
+        .faction-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        .faction-name a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .faction-name a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .faction-source {
+            font-size: 0.9em;
+            color: #aaa;
+            font-style: italic;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .empty-state {
+            text-align: center;
+            color: #aaa;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌌 Twilight Imperium Faction Picker</h1>
+        <button onclick="pickFactions()">Pick 6 Random Factions</button>
+        <div id="results" class="results">
+            <div class="empty-state">Click the button to randomly select 6 factions!</div>
+        </div>
+    </div>
+
+    <script>
+        const factions = [
+            // Base Game
+            { name: "The Arborec", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Arborec" },
+            { name: "The Barony of Letnev", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Barony_of_Letnev" },
+            { name: "The Clan of Saar", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Clan_of_Saar" },
+            { name: "The Embers of Muaat", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Embers_of_Muaat" },
+            { name: "The Emirates of Hacan", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Emirates_of_Hacan" },
+            { name: "The Federation of Sol", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Federation_of_Sol" },
+            { name: "The Ghosts of Creuss", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Ghosts_of_Creuss" },
+            { name: "The L1Z1X Mindnet", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_L1Z1X_Mindnet" },
+            { name: "The Mentak Coalition", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Mentak_Coalition" },
+            { name: "The Naalu Collective", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Naalu_Collective" },
+            { name: "The Nekro Virus", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Nekro_Virus" },
+            { name: "Sardakk N'orr", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/Sardakk_N%27orr" },
+            { name: "The Universities of Jol-Nar", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Universities_of_Jol-Nar" },
+            { name: "The Winnu", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Winnu" },
+            { name: "The Xxcha Kingdom", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Xxcha_Kingdom" },
+            { name: "The Yin Brotherhood", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Yin_Brotherhood" },
+            { name: "The Yssaril Tribes", source: "Base Game", url: "https://twilight-imperium.fandom.com/wiki/The_Yssaril_Tribes" },
+            // Prophecy of Kings
+            { name: "The Argent Flight", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Argent_Flight" },
+            { name: "The Empyrean", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Empyrean" },
+            { name: "The Mahact Gene-Sorcerers", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Mahact_Gene-Sorcerers" },
+            { name: "The Naaz-Rokha Alliance", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Naaz-Rokha_Alliance" },
+            { name: "The Nomad", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Nomad" },
+            { name: "The Titans of Ul", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Titans_of_Ul" },
+            { name: "The Vuil'Raith Cabal", source: "Prophecy of Kings", url: "https://twilight-imperium.fandom.com/wiki/The_Vuil%27Raith_Cabal" },
+            // Codex III
+            { name: "The Council Keleres", source: "Codex III", url: "https://twilight-imperium.fandom.com/wiki/The_Council_Keleres" },
+            // Thunder's Edge
+            { name: "Last Bastion", source: "Thunder's Edge", url: "https://twilight-imperium.fandom.com/wiki/Last_Bastion" },
+            { name: "The Ral Nel Consortium", source: "Thunder's Edge", url: "https://twilight-imperium.fandom.com/wiki/The_Ral_Nel_Consortium" },
+            { name: "The Crimson Rebellion", source: "Thunder's Edge", url: "https://twilight-imperium.fandom.com/wiki/The_Crimson_Rebellion" },
+            { name: "The Deepwrought Scholarate", source: "Thunder's Edge", url: "https://twilight-imperium.fandom.com/wiki/The_Deepwrought_Scholarate" },
+            { name: "The Firmament / The Obsidian", source: "Thunder's Edge", url: "https://twilight-imperium.fandom.com/wiki/The_Firmament_/_The_Obsidian" }
+        ];
+
+        function pickFactions() {
+            const shuffled = [...factions].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, 6);
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            selected.forEach((faction, index) => {
+                const factionDiv = document.createElement('div');
+                factionDiv.className = 'faction';
+                factionDiv.style.animationDelay = `${index * 0.1}s`;
+                factionDiv.innerHTML = `
+                    <div class="faction-name"><a href="${faction.url}" target="_blank">${faction.name}</a></div>
+                    <div class="faction-source">${faction.source}</div>
+                `;
+                resultsDiv.appendChild(factionDiv);
+            });
+        }
+
+        // Auto-run on page load
+        pickFactions();
+    </script>
+</body>
+</html>
